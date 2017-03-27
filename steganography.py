@@ -62,17 +62,12 @@ def encode_image(text_to_encode= 'SURPRISE!!', template_image="images/samoyed.jp
     template_image: the image to use for encoding. An image is provided by default.
     """
     encoded_image = Image.open(template_image)
-    green_channel = encoded_image.split()[0]
-    green_loaded = green_channel.load()
+    red_channel = encoded_image.split()[0]
+    red_loaded = red_channel.load()
 
     image_text = write_text("SURPRISE!!", encoded_image.size)
     pixels = image_text.load()
     image_text.save("images/image_text.png")
-    """
-    new_image = Image.new("RGB",encoded_image.size)
-    new_green = new_image.split()[0]
-    new_pix = new.load()
-    """
     #encode_pixels= encode_image.load()
 
     x_size = image_text.size[0]
@@ -80,19 +75,20 @@ def encode_image(text_to_encode= 'SURPRISE!!', template_image="images/samoyed.jp
 
     for row in range(x_size):
         for col in range(y_size):
-            green_pix = green_loaded[row,col]
+            red_pix = red_loaded[row,col]
+            #checking to see if the pixel from word file is black
             if pixels[row,col] == (0,0,0):
-                #green_pix = int(green_pix)
-                if green_pix & 1 == 1:
+                #if it is, and if the last bit of the red column is 1, then it will take its complement
+                if red_pix & 1 == 1:
                     new_pix[row,col]
-                    green_pix = green_pix & ~1
+                    red_pix = red_pix & ~1
+            # checks to see if the pixel is white
             elif pixels[row,col] == (255,255,255):
-                #print(row,col)
-                green_pix = int(green_pix)
-                if green_pix & 1 == 0:
-                    #print(green_pix&1)
-                    green_pix= green_pix | 1
-            green_loaded[row,col] = green_pix
+                #if the last bit of the red column is 0, then takes the complement
+                if red_pix & 1 == 0:
+                    red_pix= red_pix | 1
+            #saves everything and loads it
+            red_loaded[row,col] = red_pix
         encoded_image.save("images/index.png")
 
 if __name__ == '__main__':
